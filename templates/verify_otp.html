@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>OTP Verification</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f5f7fa;
+    margin:0;
+}
+
+/* NAVBAR */
+.navbar{
+    background:#1e3a8a;
+    color:white;
+    padding:15px;
+    text-align:center;
+}
+
+/* BOX */
+.container{
+    width:350px;
+    margin:80px auto;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+input, button{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button{
+    background:#1e3a8a;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#162d66;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>OTP Verification</h2>
+</div>
+
+<div class="container">
+
+<h3>Enter OTP to Continue</h3>
+
+<form method="POST">
+
+<input type="text" name="otp" placeholder="Enter OTP" required>
+
+<button type="submit">Verify</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
