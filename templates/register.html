@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+    color:white;
+}
+
+/* NAVBAR */
+.navbar{
+    background: rgba(0,0,0,0.4);
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.navbar h2{
+    margin:0;
+}
+
+.navbar a{
+    color:white;
+    text-decoration:none;
+    margin-left:15px;
+}
+
+/* FORM BOX */
+.container{
+    width:380px;
+    margin:50px auto;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+}
+
+/* INPUTS */
+input, select, button{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:5px;
+    border:none;
+}
+
+input, select{
+    background:white;
+    color:black;
+}
+
+/* BUTTON */
+button{
+    background:#22c55e;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* MESSAGE */
+.message{
+    text-align:center;
+    margin:15px;
+}
+
+.success{
+    background:#22c55e;
+    padding:10px;
+    border-radius:5px;
+}
+
+.error{
+    background:#ef4444;
+    padding:10px;
+    border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <h2>AI GARUDA</h2>
+    <div>
+        <a href="/">Home</a>
+        <a href="/add">Report Missing</a>
+        <a href="/admin">Admin</a>
+    </div>
+</div>
+
+<!-- MESSAGE -->
+<div class="message">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="{{ messages[-1][0] }}">
+      {{ messages[-1][1] }}
+    </div>
+  {% endif %}
+{% endwith %}
+</div>
+
+<!-- FORM -->
+<div class="container">
+
+<h2>Create Account</h2>
+
+<form method="POST">
+
+<input type="text" name="name" placeholder="Name / Organisation" required>
+
+<input type="text" name="username" placeholder="Username" required>
+
+<input type="password" name="password" placeholder="Password" required>
+
+<input type="text" name="phone" placeholder="Phone Number" required>
+
+<input type="text" name="state" placeholder="State" required>
+
+<input type="text" name="district" placeholder="District" required>
+
+<input type="text" name="city" placeholder="City / Area" required>
+
+<select name="role" required>
+<option value="">Select Role</option>
+<option>Individual</option>
+<option>Police</option>
+<option>NGO</option>
+</select>
+
+<button type="submit">Register</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
