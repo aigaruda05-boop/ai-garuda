@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Report Missing Person</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    color:white;
+
+    /* 🔥 SAME GRADIENT BACKGROUND */
+    background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+    min-height:100vh;
+    position:relative;
+}
+
+/* 🔥 LOGO WATERMARK */
+body::before{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    width:400px;
+    height:400px;
+    background:url("/static/uploads/logo.png") no-repeat center;
+    background-size:contain;
+    opacity:0.08;
+    z-index:0;
+}
+
+/* NAVBAR */
+.navbar{
+    background: rgba(0,0,0,0.4);
+    padding:15px;
+    text-align:center;
+    position:relative;
+    z-index:1;
+}
+
+/* FORM BOX */
+.form-container{
+    width:350px;
+    margin:40px auto;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.4);
+    position:relative;
+    z-index:1;
+}
+
+/* INPUTS */
+input, textarea, button{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:5px;
+    border:none;
+}
+
+input, textarea{
+    background: rgba(255,255,255,0.9);
+    color:black;
+}
+
+/* BUTTON */
+button{
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
+
+/* MESSAGE */
+.message{
+    text-align:center;
+    margin:20px;
+    position:relative;
+    z-index:1;
+}
+
+.success{
+    background:#22c55e;
+    padding:10px;
+    border-radius:5px;
+    width:60%;
+    margin:auto;
+}
+
+.error{
+    background:#ef4444;
+    padding:10px;
+    border-radius:5px;
+    width:60%;
+    margin:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Report Missing Person</h2>
+</div>
+
+<!-- MESSAGE -->
+<div class="message">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="{{ messages[-1][0] }}">
+      {{ messages[-1][1] }}
+    </div>
+  {% endif %}
+{% endwith %}
+</div>
+
+<div class="form-container">
+
+<form method="POST" enctype="multipart/form-data">
+
+<input type="text" name="name" placeholder="Full Name" required>
+
+<input type="number" name="age" placeholder="Age" required>
+
+<input type="text" name="state" placeholder="State" required>
+
+<input type="text" name="district" placeholder="District" required>
+
+<input type="text" name="village" placeholder="Village" required>
+
+<input type="text" name="colony" placeholder="Colony / Area" required>
+
+<label>Date Missing:</label>
+<input type="date" name="date_missing" required>
+
+<input type="text" name="contact" placeholder="Contact Number" required>
+
+<label>Description:</label>
+<textarea name="description" placeholder="Write details..." required></textarea>
+
+<label>Upload Photo:</label>
+<input type="file" name="photo" required>
+
+<button type="submit">Submit</button>
+
+</form>
+
+</div>
+
+<script>
+setTimeout(function(){
+    let msg = document.querySelector('.success, .error');
+    if(msg){
+        msg.style.display = 'none';
+    }
+}, 3000);
+</script>
+
+</body>
+</html>
