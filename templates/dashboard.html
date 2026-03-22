@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    margin:0;
+}
+
+h2{
+    text-align:center;
+    padding:20px;
+}
+
+table{
+    width:90%;
+    margin:auto;
+    background:white;
+    color:black;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+a{
+    color:red;
+    text-decoration:none;
+}
+
+.top{
+    text-align:center;
+    margin:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<div class="top">
+<a href="/logout">Logout</a>
+</div>
+
+<table>
+
+<tr>
+<th>Name</th>
+<th>State</th>
+<th>District</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+{% for person in persons %}
+<tr>
+<td>{{person[1]}}</td>
+<td>{{person[3]}}</td>
+<td>{{person[4]}}</td>
+<td>{{person[11]}}</td>
+<td>
+<a href="/delete/{{person[0]}}">Delete</a>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>
