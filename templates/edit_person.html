@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit</title>
+
+<style>
+body{
+    font-family:Arial;
+    background: linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+    color:white;
+    text-align:center;
+}
+
+.container{
+    width:400px;
+    margin:50px auto;
+    background: rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:10px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Edit Details</h2>
+
+<form method="POST">
+
+<input name="name" value="{{person[1]}}">
+<input name="age" value="{{person[2]}}">
+<input name="state" value="{{person[3]}}">
+<input name="district" value="{{person[4]}}">
+<input name="village" value="{{person[5]}}">
+<input name="colony" value="{{person[6]}}">
+<input name="date_missing" value="{{person[7]}}">
+<input name="contact" value="{{person[8]}}">
+<input name="description" value="{{person[9]}}">
+
+<button>Update</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
