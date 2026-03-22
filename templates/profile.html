@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Profile</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background: linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+    color:white;
+}
+
+.navbar{
+    background: rgba(0,0,0,0.4);
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.container{
+    width:400px;
+    margin:60px auto;
+    background: rgba(255,255,255,0.1);
+    padding:25px;
+    border-radius:10px;
+}
+
+.info{
+    margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+<h2>AI GARUDA</h2>
+<a href="/">Home</a>
+</div>
+
+<div class="container">
+
+<h2>Your Profile</h2>
+
+<div class="info"><b>Name:</b> {{user[1]}}</div>
+<div class="info"><b>Username:</b> {{user[2]}}</div>
+<div class="info"><b>Phone:</b> {{user[4]}}</div>
+<div class="info"><b>State:</b> {{user[5]}}</div>
+<div class="info"><b>District:</b> {{user[6]}}</div>
+<div class="info"><b>City:</b> {{user[7]}}</div>
+
+</div>
+
+</body>
+</html>
