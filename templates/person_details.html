@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Details</title>
+
+<style>
+body{
+    font-family:Arial;
+    background: linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+    color:white;
+    text-align:center;
+}
+
+.container{
+    width:400px;
+    margin:50px auto;
+    background: rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:10px;
+}
+
+img{
+    width:100%;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<img src="/static/uploads/{{person[10]}}">
+
+<h2>{{person[1]}}</h2>
+
+<p><b>Age:</b> {{person[2]}}</p>
+<p><b>State:</b> {{person[3]}}</p>
+<p><b>District:</b> {{person[4]}}</p>
+<p><b>Village:</b> {{person[5]}}</p>
+<p><b>Colony:</b> {{person[6]}}</p>
+
+<p><b>Date Missing:</b> {{person[7]}}</p>
+<p><b>Contact:</b> {{person[8]}}</p>
+
+<p><b>Description:</b> {{person[9]}}</p>
+
+<p><b>Status:</b> {{person[11]}}</p>
+
+</div>
+
+</body>
+</html>
