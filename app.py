@@ -1,120 +1,213 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
 import os
-from werkzeug.utils import secure_filename
+import time
 
 app = Flask(__name__)
+app.secret_key = "aigaruda_secret"
 
-# ================= CONFIG =================
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 
 # ================= DATABASE =================
-def get_db_connection():
+def init_db():
     conn = sqlite3.connect("missing.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+    c = conn.cursor()
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS persons(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        age TEXT,
+        state TEXT,
+        district TEXT,
+        village TEXT,
+        colony TEXT,
+        date_missing TEXT,
+        contact TEXT,
+        description TEXT,
+        photo TEXT,
+        status TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+init_db()
 
 
 # ================= HOME =================
 @app.route("/")
-def index():
-    conn = get_db_connection()
-    persons = conn.execute("SELECT * FROM persons").fetchall()
+def home():
+    search = request.args.get("search")
+
+    conn = sqlite3.connect("missing.db")
+    c = conn.cursor()
+
+    if search:
+        c.execute("""
+        SELECT * FROM persons 
+        WHERE name LIKE ? 
+        OR state LIKE ? 
+        OR district LIKE ? 
+        OR village LIKE ?
+        """, (
+            '%' + search + '%',
+            '%' + search + '%',
+            '%' + search + '%',
+            '%' + search + '%'
+        ))
+    else:
+        c.execute("SELECT * FROM persons")
+
+    persons = c.fetchall()
     conn.close()
+
     return render_template("index.html", persons=persons)
 
 
-# ================= ADD PERSON =================
-@app.route("/add", methods=["GET", "POST"])
-def add_person():
+# ================= ADD =================
+@app.route("/add", methods=["GET","POST"])
+def add():
+
     if request.method == "POST":
+
         name = request.form.get("name")
         age = request.form.get("age")
-        place = request.form.get("place")
+        state = request.form.get("state")
+        district = request.form.get("district")
+        village = request.form.get("village")
+        colony = request.form.get("colony")
+        date_missing = request.form.get("date_missing")
+        contact = request.form.get("contact")
         description = request.form.get("description")
+        photo = request.files.get("photo")
 
-        file = request.files.get("image")
-        filename = ""
+        # VALIDATION
+        if not all([name, age, state, district, village, colony, date_missing, contact, description]) or not photo:
+            flash("Please fill all fields!", "error")
+            return redirect("/add")
 
-        if file and file.filename != "":
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        filename = str(time.time()) + photo.filename
+        photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
-        conn = get_db_connection()
-        conn.execute(
-            "INSERT INTO persons (name, age, place, description, image) VALUES (?, ?, ?, ?, ?)",
-            (name, age, place, description, filename),
+        conn = sqlite3.connect("missing.db")
+        c = conn.cursor()
+
+        c.execute("""
+        INSERT INTO persons (
+            name, age, state, district, village, colony,
+            date_missing, contact, description,
+            photo, status
         )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            name, age, state, district, village, colony,
+            date_missing, contact, description,
+            filename, "Missing"
+        ))
+
         conn.commit()
         conn.close()
 
-        return redirect(url_for("index"))
+        flash("Person reported successfully!", "success")
+        return redirect("/")
 
     return render_template("add_person.html")
 
 
-# ================= PERSON DETAILS =================
+# ================= VIEW =================
 @app.route("/person/<int:id>")
 def person_details(id):
-    conn = get_db_connection()
-    person = conn.execute("SELECT * FROM persons WHERE id = ?", (id,)).fetchone()
+
+    conn = sqlite3.connect("missing.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM persons WHERE id=?", (id,))
+    person = c.fetchone()
+
     conn.close()
+
     return render_template("person_details.html", person=person)
 
 
-# ================= EDIT PERSON =================
-@app.route("/edit/<int:id>", methods=["GET", "POST"])
-def edit_person(id):
-    conn = get_db_connection()
-    person = conn.execute("SELECT * FROM persons WHERE id = ?", (id,)).fetchone()
+# ================= EDIT =================
+@app.route("/edit/<int:id>", methods=["GET","POST"])
+def edit(id):
+
+    conn = sqlite3.connect("missing.db")
+    c = conn.cursor()
 
     if request.method == "POST":
+
         name = request.form.get("name")
         age = request.form.get("age")
-        place = request.form.get("place")
+        state = request.form.get("state")
+        district = request.form.get("district")
+        village = request.form.get("village")
+        colony = request.form.get("colony")
+        date_missing = request.form.get("date_missing")
+        contact = request.form.get("contact")
         description = request.form.get("description")
 
-        conn.execute(
-            "UPDATE persons SET name=?, age=?, place=?, description=? WHERE id=?",
-            (name, age, place, description, id),
-        )
+        # VALIDATION
+        if not all([name, age, state, district, village, colony, date_missing, contact, description]):
+            flash("All fields are required!", "error")
+            return redirect(f"/edit/{id}")
+
+        c.execute("""
+        UPDATE persons SET
+        name=?, age=?, state=?, district=?, village=?, colony=?,
+        date_missing=?, contact=?, description=?
+        WHERE id=?
+        """, (
+            name, age, state, district, village, colony,
+            date_missing, contact, description,
+            id
+        ))
+
         conn.commit()
         conn.close()
 
-        return redirect(url_for("index"))
+        flash("Updated successfully!", "success")
+        return redirect("/")
+
+    c.execute("SELECT * FROM persons WHERE id=?", (id,))
+    person = c.fetchone()
 
     conn.close()
+
     return render_template("edit_person.html", person=person)
 
 
-# ================= DELETE PERSON =================
+# ================= DELETE =================
 @app.route("/delete/<int:id>")
-def delete_person(id):
-    conn = get_db_connection()
-    conn.execute("DELETE FROM persons WHERE id = ?", (id,))
+def delete(id):
+
+    conn = sqlite3.connect("missing.db")
+    c = conn.cursor()
+
+    c.execute("DELETE FROM persons WHERE id=?", (id,))
     conn.commit()
     conn.close()
-    return redirect(url_for("index"))
+
+    return redirect("/")
 
 
-# ================= SEARCH =================
-@app.route("/search", methods=["POST"])
-def search():
-    query = request.form.get("query")
+# ================= MARK FOUND =================
+@app.route("/found/<int:id>")
+def found(id):
 
-    conn = get_db_connection()
-    persons = conn.execute(
-        "SELECT * FROM persons WHERE place LIKE ?", ("%" + query + "%",)
-    ).fetchall()
+    conn = sqlite3.connect("missing.db")
+    c = conn.cursor()
+
+    c.execute("UPDATE persons SET status='Found' WHERE id=?", (id,))
+    conn.commit()
     conn.close()
 
-    return render_template("index.html", persons=persons)
+    return redirect("/")
 
 
-# ================= RUN (IMPORTANT FOR RENDER) =================
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+# 🚫 IMPORTANT: DO NOT ADD app.run()
+# Render uses Gunicorn, so this is not needed
