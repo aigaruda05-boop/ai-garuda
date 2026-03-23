@@ -4,7 +4,6 @@
 <title>AI GARUDA</title>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial;
@@ -12,122 +11,38 @@ body{
     background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
 }
 
-/* NAVBAR */
 .navbar{
     background: rgba(0,0,0,0.4);
-    padding:25px 15px;
-    position:relative;
+    padding:25px;
     text-align:center;
+    position:relative;
 }
 
-/* PROFILE MENU */
-.profile-menu{
-    position:absolute;
-    left:15px;
-    top:50%;
-    transform: translateY(-50%);
-}
-
-.profile-icon{
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    cursor:pointer;
-    border:2px solid white;
-}
-
-.dropdown{
-    display:none;
-    position:absolute;
-    top:60px;
-    left:0;
-    background:white;
-    color:black;
-    padding:10px;
-    border-radius:8px;
-}
-
-.dropdown a{
-    display:block;
-    text-decoration:none;
-    color:black;
-    margin:6px 0;
-}
-
-/* RIGHT BUTTON */
 .nav-right{
     position:absolute;
     right:20px;
     top:50%;
-    transform: translateY(-50%);
+    transform:translateY(-50%);
 }
 
 .report-btn{
     background:#ef4444;
-    color:white;
     padding:8px 15px;
     border-radius:6px;
-    font-weight:bold;
+    color:white;
     text-decoration:none;
 }
 
-.report-btn:hover{
-    background:#dc2626;
-}
-
-/* HEADER */
 .header{
     text-align:center;
     padding:40px;
 }
 
-.header img{
-    width:120px;
-}
-
-/* SEARCH */
-.search-box{
-    margin-top:20px;
-}
-
 .search-box input{
     padding:10px;
-    width:260px;
-    border-radius:5px;
-    border:none;
+    width:250px;
 }
 
-.search-box button{
-    padding:10px;
-    background:#2563eb;
-    color:white;
-    border:none;
-    border-radius:5px;
-}
-
-/* MESSAGE */
-.message{
-    text-align:center;
-    margin:20px;
-}
-
-.success{
-    background:#22c55e;
-    padding:10px;
-    border-radius:5px;
-    width:60%;
-    margin:auto;
-}
-
-.error{
-    background:#ef4444;
-    padding:10px;
-    border-radius:5px;
-    width:60%;
-    margin:auto;
-}
-
-/* CARDS */
 .container{
     display:flex;
     flex-wrap:wrap;
@@ -137,11 +52,10 @@ body{
 .card{
     background:white;
     color:black;
-    width:260px;
+    width:250px;
     margin:15px;
     padding:15px;
-    border-radius:12px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.4);
+    border-radius:10px;
     text-align:center;
 }
 
@@ -149,126 +63,46 @@ body{
     width:100%;
     height:200px;
     object-fit:cover;
-    border-radius:8px;
 }
-
-.btn{
-    display:inline-block;
-    margin-top:10px;
-    margin-right:5px;
-    padding:8px 12px;
-    border-radius:5px;
-    color:white;
-    text-decoration:none;
-}
-
-/* BUTTON COLORS */
-.view{
-    background:#2563eb;
-}
-
-.edit{
-    background:#f59e0b;
-}
-
-.found{
-    background:green;
-}
-
-.delete{
-    background:red;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
-
-    <!-- PROFILE -->
-    <div class="profile-menu">
-        <img src="/static/uploads/logo.png" class="profile-icon" onclick="toggleMenu()">
-
-        <div id="dropdown" class="dropdown">
-            {% if session.get("user") %}
-                <a href="/profile">👤 {{ session.get("name") }}</a>
-                <a href="/user_logout">Logout</a>
-            {% else %}
-                <a href="/login">Login</a>
-                <a href="/register">Register</a>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- TITLE -->
     <h2>AI GARUDA</h2>
 
-    <!-- REPORT BUTTON -->
     <div class="nav-right">
         <a href="/add" class="report-btn">Report Missing</a>
     </div>
-
 </div>
 
-<!-- MESSAGE -->
-<div class="message">
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="{{ messages[-1][0] }}">
-      {{ messages[-1][1] }}
-    </div>
-  {% endif %}
-{% endwith %}
-</div>
-
-<!-- HEADER -->
 <div class="header">
-    <img src="/static/uploads/logo.png">
     <h1>Missing Persons Network</h1>
 
-    <!-- SEARCH -->
-    <div class="search-box">
-        <form method="GET">
-            <input type="text" name="search" placeholder="Search by name or place...">
-            <button>Search</button>
-        </form>
-    </div>
-
+    <form method="GET" class="search-box">
+        <input type="text" name="search" placeholder="Search by name or place">
+        <button>Search</button>
+    </form>
 </div>
 
-<!-- CARDS -->
 <div class="container">
+
 {% for person in persons %}
 <div class="card">
 
-<img src="/static/uploads/{{person[10]}}">
+<img src="{{ url_for('static', filename='uploads/' + person[10]) }}">
 
 <h3>{{person[1]}}</h3>
 
-<p><b>Age:</b> {{person[2]}}</p>
-<p><b>Location:</b> {{person[3]}}, {{person[4]}}</p>
+<p>{{person[3]}}, {{person[4]}}</p>
 
-<p><b>Status:</b> {{person[11]}}</p>
-
-<!-- BUTTONS -->
-<a href="/person/{{person[0]}}" class="btn view">View</a>
-<a href="/edit/{{person[0]}}" class="btn edit">Edit</a>
-<a href="/found/{{person[0]}}" class="btn found">Found</a>
-<a href="/delete/{{person[0]}}" class="btn delete">Delete</a>
+<a href="/person/{{person[0]}}">View Details</a>
 
 </div>
 {% endfor %}
-</div>
 
-<!-- SCRIPT -->
-<script>
-function toggleMenu(){
-    let menu = document.getElementById("dropdown");
-    menu.style.display = menu.style.display === "block" ? "none" : "block";
-}
-</script>
+</div>
 
 </body>
 </html>
