@@ -1,53 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Details</title>
-
-<style>
-body{
-    font-family:Arial;
-    background: linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-    color:white;
-    text-align:center;
-}
-
-.container{
-    width:400px;
-    margin:50px auto;
-    background: rgba(255,255,255,0.1);
-    padding:20px;
-    border-radius:10px;
-}
-
-img{
-    width:100%;
-    border-radius:10px;
-}
-</style>
+    <title>Details</title>
 </head>
-
 <body>
 
-<div class="container">
+<h2>{{ person[1] }}</h2>
 
-<img src="/static/uploads/{{person[10]}}">
+<p>Age: {{ person[2] }}</p>
+<p>Location: {{ person[3] }}, {{ person[4] }}, {{ person[5] }}</p>
+<p>Colony: {{ person[6] }}</p>
+<p>Date Missing: {{ person[7] }}</p>
+<p>Contact: {{ person[8] }}</p>
+<p>Description: {{ person[9] }}</p>
 
-<h2>{{person[1]}}</h2>
+{% if person[10] %}
+<img src="{{ url_for('static', filename='uploads/' + person[10]) }}" width="200">
+{% endif %}
 
-<p><b>Age:</b> {{person[2]}}</p>
-<p><b>State:</b> {{person[3]}}</p>
-<p><b>District:</b> {{person[4]}}</p>
-<p><b>Village:</b> {{person[5]}}</p>
-<p><b>Colony:</b> {{person[6]}}</p>
+<br><br>
 
-<p><b>Date Missing:</b> {{person[7]}}</p>
-<p><b>Contact:</b> {{person[8]}}</p>
-
-<p><b>Description:</b> {{person[9]}}</p>
-
-<p><b>Status:</b> {{person[11]}}</p>
-
-</div>
+<a href="/">Back</a>
 
 </body>
 </html>
