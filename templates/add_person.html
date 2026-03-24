@@ -1,34 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Report Missing</title>
+<title>Report Missing Person</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    color:white;
+    background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+}
+
+.navbar{
+    background: rgba(0,0,0,0.4);
+    padding:25px;
+    text-align:center;
+}
+
+.container{
+    text-align:center;
+    padding:40px;
+}
+
+form input, textarea{
+    width:250px;
+    padding:10px;
+    margin:8px;
+}
+
+button{
+    padding:10px 20px;
+    background:#ef4444;
+    color:white;
+    border:none;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Report Missing Person</h2>
+<div class="navbar">
+    <h2>AI GARUDA</h2>
+</div>
+
+<div class="container">
+
+<h1>Report Missing Person</h1>
 
 <form method="POST" enctype="multipart/form-data">
 
-    Name: <input type="text" name="name"><br><br>
-    Age: <input type="text" name="age"><br><br>
+<input name="name" placeholder="Name"><br>
+<input name="age" placeholder="Age"><br>
 
-    State: <input type="text" name="state"><br><br>
-    District: <input type="text" name="district"><br><br>
-    Village: <input type="text" name="village"><br><br>
-    Colony: <input type="text" name="colony"><br><br>
+<input name="state" placeholder="State"><br>
+<input name="district" placeholder="District"><br>
+<input name="village" placeholder="Village"><br>
+<input name="colony" placeholder="Colony"><br>
 
-    Date Missing: <input type="date" name="date_missing"><br><br>
+<input type="date" name="date_missing"><br>
+<input name="contact" placeholder="Your Contact"><br>
 
-    Contact: <input type="text" name="contact"><br><br>
+<textarea name="description" placeholder="Details"></textarea><br>
 
-    Description:<br>
-    <textarea name="description"></textarea><br><br>
+<input type="file" name="photo"><br><br>
 
-    Photo: <input type="file" name="photo"><br><br>
-
-    <button type="submit">Submit</button>
+<button>Submit Report</button>
 
 </form>
+
+</div>
 
 </body>
 </html>
