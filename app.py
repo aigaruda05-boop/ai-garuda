@@ -9,6 +9,7 @@ UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 # ================= DATABASE =================
 def get_db():
     return sqlite3.connect("missing.db")
@@ -100,3 +101,32 @@ def person_details(id):
     conn.close()
 
     return render_template("person_details.html", person=person)
+
+
+# ================= DELETE =================
+@app.route("/delete/<int:id>", methods=["GET", "POST"])
+def delete_person(id):
+
+    if request.method == "POST":
+        contact = request.form.get("contact")
+
+        conn = get_db()
+        c = conn.cursor()
+
+        c.execute("SELECT contact FROM persons WHERE id=?", (id,))
+        person = c.fetchone()
+
+        if person and (contact == person[0] or contact == "ADMIN123"):
+            c.execute("DELETE FROM persons WHERE id=?", (id,))
+            conn.commit()
+            conn.close()
+            return redirect("/")
+        else:
+            conn.close()
+            return "❌ Not Authorized"
+
+    return render_template("delete_verify.html", id=id)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
