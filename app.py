@@ -1,132 +1,101 @@
-from flask import Flask, render_template, request, redirect
-import sqlite3
+from flask import Flask, render_template, request, redirect, url_for
+import psycopg2
 import os
-import time
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "static/uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# ================= DATABASE CONNECTION =================
 
-
-# ================= DATABASE =================
 def get_db():
-    return sqlite3.connect("missing.db")
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
 
+# ================= CREATE TABLE =================
 
-# ================= HOME + SEARCH =================
+def create_table():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS persons (
+        id SERIAL PRIMARY KEY,
+        name TEXT,
+        age TEXT,
+        place TEXT,
+        description TEXT,
+        image TEXT
+    )
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+create_table()
+
+# ================= HOME =================
+
 @app.route("/")
 def home():
-    search = request.args.get("search")
-
     conn = get_db()
-    c = conn.cursor()
+    cur = conn.cursor()
 
-    if search:
-        c.execute("""
-        SELECT * FROM persons 
-        WHERE name LIKE ? 
-        OR state LIKE ? 
-        OR district LIKE ? 
-        OR village LIKE ?
-        """, (
-            '%' + search + '%',
-            '%' + search + '%',
-            '%' + search + '%',
-            '%' + search + '%'
-        ))
-    else:
-        c.execute("SELECT * FROM persons")
+    cur.execute("SELECT * FROM persons ORDER BY id DESC")
+    data = cur.fetchall()
 
-    persons = c.fetchall()
+    cur.close()
     conn.close()
 
-    return render_template("index.html", persons=persons)
+    return render_template("index.html", data=data)
 
+# ================= REPORT MISSING =================
 
-# ================= ADD =================
-@app.route("/add", methods=["GET", "POST"])
-def add_person():
+@app.route("/report", methods=["GET", "POST"])
+def report():
     if request.method == "POST":
-
-        name = request.form.get("name")
-        age = request.form.get("age")
-        state = request.form.get("state")
-        district = request.form.get("district")
-        village = request.form.get("village")
-        colony = request.form.get("colony")
-        date_missing = request.form.get("date_missing")
-        contact = request.form.get("contact")
-        description = request.form.get("description")
-
-        photo = request.files.get("photo")
-        filename = ""
-
-        if photo:
-            filename = str(time.time()) + photo.filename
-            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        name = request.form["name"]
+        age = request.form["age"]
+        place = request.form["place"]
+        description = request.form["description"]
+        image = request.form["image"]
 
         conn = get_db()
-        c = conn.cursor()
+        cur = conn.cursor()
 
-        c.execute("""
-        INSERT INTO persons (
-            name, age, state, district, village, colony,
-            date_missing, contact, description, photo
+        cur.execute(
+            "INSERT INTO persons (name, age, place, description, image) VALUES (%s, %s, %s, %s, %s)",
+            (name, age, place, description, image)
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            name, age, state, district, village, colony,
-            date_missing, contact, description, filename
-        ))
 
         conn.commit()
+        cur.close()
         conn.close()
 
-        return redirect("/")
+        return redirect(url_for("home"))
 
-    return render_template("add_person.html")
+    return render_template("report.html")
 
+# ================= SEARCH =================
 
-# ================= DETAILS =================
-@app.route("/person/<int:id>")
-def person_details(id):
+@app.route("/search", methods=["POST"])
+def search():
+    keyword = request.form["keyword"]
+
     conn = get_db()
-    c = conn.cursor()
+    cur = conn.cursor()
 
-    c.execute("SELECT * FROM persons WHERE id=?", (id,))
-    person = c.fetchone()
+    cur.execute(
+        "SELECT * FROM persons WHERE name ILIKE %s OR place ILIKE %s",
+        (f"%{keyword}%", f"%{keyword}%")
+    )
 
+    data = cur.fetchall()
+
+    cur.close()
     conn.close()
 
-    return render_template("person_details.html", person=person)
+    return render_template("index.html", data=data)
 
-
-# ================= DELETE =================
-@app.route("/delete/<int:id>", methods=["GET", "POST"])
-def delete_person(id):
-
-    if request.method == "POST":
-        contact = request.form.get("contact")
-
-        conn = get_db()
-        c = conn.cursor()
-
-        c.execute("SELECT contact FROM persons WHERE id=?", (id,))
-        person = c.fetchone()
-
-        if person and (contact == person[0] or contact == "ADMIN123"):
-            c.execute("DELETE FROM persons WHERE id=?", (id,))
-            conn.commit()
-            conn.close()
-            return redirect("/")
-        else:
-            conn.close()
-            return "❌ Not Authorized"
-
-    return render_template("delete_verify.html", id=id)
-
+# ================= RUN =================
 
 if __name__ == "__main__":
     app.run(debug=True)
