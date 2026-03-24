@@ -1,26 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Details</title>
-</head>
-<body>
+<h2>{{person[1]}}</h2>
 
-<h2>{{ person[1] }}</h2>
+<p>Age: {{person[2]}}</p>
+<p>Location: {{person[3]}}, {{person[4]}}</p>
+<p>Contact: {{person[8]}}</p>
+<p>{{person[9]}}</p>
 
-<p>Age: {{ person[2] }}</p>
-<p>Location: {{ person[3] }}, {{ person[4] }}, {{ person[5] }}</p>
-<p>Colony: {{ person[6] }}</p>
-<p>Date Missing: {{ person[7] }}</p>
-<p>Contact: {{ person[8] }}</p>
-<p>Description: {{ person[9] }}</p>
-
-{% if person[10] %}
-<img src="{{ url_for('static', filename='uploads/' + person[10]) }}" width="200">
-{% endif %}
+<img src="{{ url_for('static', filename='uploads/' + person[10]) }}">
 
 <br><br>
 
+<a href="/delete/{{person[0]}}">Delete</a>
+<br><br>
 <a href="/">Back</a>
-
-</body>
-</html>
