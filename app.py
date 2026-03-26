@@ -1,101 +1,134 @@
-from flask import Flask, render_template, request, redirect, url_for
-import psycopg2
+from flask import Flask, render_template, request, redirect
+import sqlite3
 import os
+import time
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-# ================= DATABASE CONNECTION =================
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# ================= DATABASE =================
 def get_db():
-    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+    return sqlite3.connect("missing.db")
+
 
 # ================= CREATE TABLE =================
-
 def create_table():
     conn = get_db()
-    cur = conn.cursor()
+    c = conn.cursor()
 
-    cur.execute("""
+    c.execute("""
     CREATE TABLE IF NOT EXISTS persons (
-        id SERIAL PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         age TEXT,
-        place TEXT,
+        state TEXT,
+        district TEXT,
+        village TEXT,
+        colony TEXT,
+        date_missing TEXT,
+        contact TEXT,
         description TEXT,
-        image TEXT
+        photo TEXT
     )
     """)
 
     conn.commit()
-    cur.close()
     conn.close()
 
 create_table()
 
-# ================= HOME =================
 
+# ================= HOME =================
 @app.route("/")
 def home():
+    search = request.args.get("search")
+
     conn = get_db()
-    cur = conn.cursor()
+    c = conn.cursor()
 
-    cur.execute("SELECT * FROM persons ORDER BY id DESC")
-    data = cur.fetchall()
+    if search:
+        c.execute("""
+        SELECT * FROM persons 
+        WHERE name LIKE ? 
+        OR state LIKE ? 
+        OR district LIKE ? 
+        OR village LIKE ?
+        """, (
+            '%' + search + '%',
+            '%' + search + '%',
+            '%' + search + '%',
+            '%' + search + '%'
+        ))
+    else:
+        c.execute("SELECT * FROM persons ORDER BY id DESC")
 
-    cur.close()
+    persons = c.fetchall()
     conn.close()
 
-    return render_template("index.html", data=data)
+    return render_template("index.html", persons=persons)
 
-# ================= REPORT MISSING =================
 
-@app.route("/report", methods=["GET", "POST"])
-def report():
+# ================= ADD =================
+@app.route("/add", methods=["GET", "POST"])
+def add_person():
     if request.method == "POST":
-        name = request.form["name"]
-        age = request.form["age"]
-        place = request.form["place"]
-        description = request.form["description"]
-        image = request.form["image"]
+
+        name = request.form.get("name")
+        age = request.form.get("age")
+        state = request.form.get("state")
+        district = request.form.get("district")
+        village = request.form.get("village")
+        colony = request.form.get("colony")
+        date_missing = request.form.get("date_missing")
+        contact = request.form.get("contact")
+        description = request.form.get("description")
+
+        photo = request.files.get("photo")
+        filename = ""
+
+        if photo:
+            filename = str(time.time()) + photo.filename
+            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         conn = get_db()
-        cur = conn.cursor()
+        c = conn.cursor()
 
-        cur.execute(
-            "INSERT INTO persons (name, age, place, description, image) VALUES (%s, %s, %s, %s, %s)",
-            (name, age, place, description, image)
+        c.execute("""
+        INSERT INTO persons (
+            name, age, state, district, village, colony,
+            date_missing, contact, description, photo
         )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            name, age, state, district, village, colony,
+            date_missing, contact, description, filename
+        ))
 
         conn.commit()
-        cur.close()
         conn.close()
 
-        return redirect(url_for("home"))
+        return redirect("/")
 
-    return render_template("report.html")
+    return render_template("add_person.html")
 
-# ================= SEARCH =================
 
-@app.route("/search", methods=["POST"])
-def search():
-    keyword = request.form["keyword"]
-
+# ================= DETAILS =================
+@app.route("/person/<int:id>")
+def person_details(id):
     conn = get_db()
-    cur = conn.cursor()
+    c = conn.cursor()
 
-    cur.execute(
-        "SELECT * FROM persons WHERE name ILIKE %s OR place ILIKE %s",
-        (f"%{keyword}%", f"%{keyword}%")
-    )
+    c.execute("SELECT * FROM persons WHERE id=?", (id,))
+    person = c.fetchone()
 
-    data = cur.fetchall()
-
-    cur.close()
     conn.close()
 
-    return render_template("index.html", data=data)
+    return render_template("person_details.html", person=person)
+
 
 # ================= RUN =================
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if _name_ == "_main_":
+    app.run(host="0.0.0.0", port=5000)
